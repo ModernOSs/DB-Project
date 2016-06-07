@@ -3,9 +3,13 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <stdlib.h>
+#include <math.h>
+
+#include <limits>
+using namespace std;
 
 // self-defined headers
-#include "read_file.h"
-#include "random.h"
+#include "pre_processing.h"
 
 #endif
