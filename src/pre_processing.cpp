@@ -16,6 +16,8 @@ void checkEndian() {
                         (((uint32_t)(data) & 0x0000ff00) << 8 ) | \
                         (((uint32_t)(data) & 0x000000ff) << 24))
 
+int (*images)[784];
+
 bool readFromDataset() {
     checkEndian();
     FILE *file;
@@ -33,7 +35,7 @@ bool readFromDataset() {
     }
     
     // 60,000 images, each has 784 bytes
-    int (*images)[784] = (int((*)[784]))malloc(60000 * 784 * sizeof(int));
+    images = (int((*)[784]))malloc(60000 * 784 * sizeof(int));
     for (int i = 0; i < 60000; i++) {
         for (int j = 0; j < 196; j++) {
             fread(temp, 4, 1, file);
@@ -46,9 +48,6 @@ bool readFromDataset() {
     }
     free(temp);
 
-    // projection
-
-    free(images);
     fclose (file);
     return 1;
 }
@@ -86,8 +85,8 @@ void normalize(double* data, int count) {
 }
 
 // generate random projection vectors an
+double projectData[50][784];
 void geneRandProjVects() {
-    double projectData[50][784];
     double data[784];
     int count = 784;
     for (int i = 0; i < 50; i++) {
@@ -97,7 +96,10 @@ void geneRandProjVects() {
             projectData[i][j] = data[j];
         }
     }
-    // projectData[][]
+}
+
+void projection() {
+    free(images);
 }
 
 void preProcessing() {
@@ -106,4 +108,5 @@ void preProcessing() {
         exit(1);
     }
     geneRandProjVects();
+    projection();
 }

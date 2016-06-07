@@ -6,6 +6,7 @@ bool readFromDataset();
 void boxMuller(double* data, int count);
 void normalize(double* data, int count);
 void geneRandProjVects();
+void projection();
 
 void preProcessing();
 
