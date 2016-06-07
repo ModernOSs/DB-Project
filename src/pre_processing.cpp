@@ -24,15 +24,31 @@ bool readFromDataset() {
         return 0;  // dataset is not open correctly
     
     int *temp;
-    temp = (int*)malloc(sizeof(int));
+    temp = (int*)malloc(4);
     // magic number, number of images, number of rows, number of columns
     for (int i = 0; i < 4; i++) {
         fread(temp, 4, 1, file);
         if (isLow) *temp = high2Low(*temp);
         printf("%d\n", *temp);
     }
+    
+    // 60,000 images, each has 784 bytes
+    int (*images)[784] = (int((*)[784]))malloc(60000 * 784 * sizeof(int));
+    for (int i = 0; i < 60000; i++) {
+        for (int j = 0; j < 196; j++) {
+            fread(temp, 4, 1, file);
+            if (isLow) *temp = high2Low(*temp);
+            images[i][j * 4 + 3] = (*temp) & 0x000000ff;
+            images[i][j * 4 + 2] = ((*temp) & 0x0000ff00) >> 8;
+            images[i][j * 4 + 1] = ((*temp) & 0x00ff0000) >> 16;
+            images[i][j * 4] = ((*temp) & 0xff000000) >> 24;
+        }
+    }
     free(temp);
 
+    // projection
+
+    free(images);
     fclose (file);
     return 1;
 }
@@ -79,10 +95,9 @@ void geneRandProjVects() {
             boxMuller(data, count);
             normalize(data, count);
             projectData[i][j] = data[j];
-            printf("%lf ", data[j]);
         }
-        printf("\n");
     }
+    // projectData[][]
 }
 
 void preProcessing() {

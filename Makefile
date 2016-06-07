@@ -7,4 +7,4 @@ pre_processing.o: src/pre_processing.cpp src/pre_processing.h
 	g++ -c src/pre_processing.cpp
 
 clean:
-	rm main.o random.o read_file.o
+	rm main.o pre_processing.o
