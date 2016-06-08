@@ -1,3 +1,5 @@
+// from TA's files
+
 #include "headers.h"
 
 BNode::BNode()						// constructor
@@ -20,38 +22,38 @@ BNode::~BNode()						// destructor
 }
 
 void BNode::init(					// init a new node, which not exist
-	int level,							// level (depth) in b-tree
-	BTree* btree)						// b-tree of this node
+	int level,						// level (depth) in b-tree
+	BTree* btree)					// b-tree of this node
 {
 	btree_ = btree;					// init <btree_>
 	level_ = (char) level;			// init <level_>
 
 	dirty_ = true;					// init <dirty_>
 	left_sibling_ = -1;				// init <left_sibling_>
-	right_sibling_ = -1;				// init <right_sibling_>
+	right_sibling_ = -1;			// init <right_sibling_>
 	key_ = NULL;					// init <key_>
 	son_ = -1;
 
 	num_entries_ = 0;				// init <num_entries_>
-	block_ = -1;						// init <block_>
+	block_ = -1;					// init <block_>
 	capacity_ = -1;					// init <capacity_>
 }
 
 void BNode::init_restore(			// load an exist node from disk to init
-	BTree* btree,						// b-tree of this node
-	int block)							// addr of disk for this node
+	BTree* btree,					// b-tree of this node
+	int block)						// addr of disk for this node
 {
 	btree_ = btree;					// init <btree_>
 	block_ = block;					// init <block_>
 
 	dirty_ = false;					// init <dirty_>
 	left_sibling_ = -1;				// init <left_sibling_>
-	right_sibling_ = -1;				// init <right_sibling_>
+	right_sibling_ = -1;			// init <right_sibling_>
 	key_ = NULL;					// init <key_>
 	son_ = -1;
 
 	num_entries_ = 0;				// init <num_entries_>
-	level_ = -1;						// init <block_>
+	level_ = -1;					// init <block_>
 	capacity_ = -1;					// init <capacity_>
 }
 
@@ -102,13 +104,13 @@ bool BNode::isFull()				// whether is full?
 }
 
 void BNode::set_left_sibling(		// set addr of left sibling node
-	int left_sibling)					// addr of left sibling node
+	int left_sibling)				// addr of left sibling node
 {
 	left_sibling_ = left_sibling;
 }
 
 void BNode::set_right_sibling(		// set addr of right sibling node
-	int right_sibling)					// addr of right sibling node
+	int right_sibling)				// addr of right sibling node
 {
 	right_sibling_ = right_sibling;
 }

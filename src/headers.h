@@ -5,11 +5,13 @@
 #include <stdlib.h>
 #include <stdlib.h>
 #include <math.h>
+#include <time.h>
 
 #include <limits>
 using namespace std;
 
 // self-defined headers
 #include "pre_processing.h"
+#include "b_node.h"
 
 #endif
