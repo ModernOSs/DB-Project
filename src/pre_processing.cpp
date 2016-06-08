@@ -158,7 +158,7 @@ void preProcessing(double (&projectData_)[50][784], bool & isLow_) {
     clock_t start = clock();
     printf("==================== Pre-processing ====================\n");
     if (readFromDataset() == 0) {
-        printf("dataset is not open correctly\n");
+        printf("Dataset is not open correctly\n");
         exit(1);
     }
     geneRandProjVects();
