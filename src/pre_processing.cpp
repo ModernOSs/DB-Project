@@ -147,7 +147,7 @@ void bulkLoading() {
         BNode *root = NULL;
         BTree *bTree = new BTree(root);
         bTree->bulkLoading(projectVector[i]);
-        // write to disk
+        bTree->writeFile();
     }
 
     free(projectVector);
@@ -164,6 +164,7 @@ void preProcessing() {
     projection();
     sortVector();
     bulkLoading();
+
     double end = (double)(clock() - start) / (double)CLOCKS_PER_SEC;
     printf("\nPre-processing takes %lf seconds.\n", end);
 }

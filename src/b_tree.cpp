@@ -17,11 +17,6 @@ void BTree::bulkLoading(projectNode projectVector[60000])
     int nodesInLevel0 = ceil((double)60000 / (double)vectorsInNode);
     int nodesInLevel1 = ceil((double)nodesInLevel0 / (double)vectorsInNode);
     BNode *bNode = new BNode[nodesInLevel0 + nodesInLevel1 + 1];
-    for (int i = 0; i < nodesInLevel0 + nodesInLevel1 + 1; i++) {
-        bNode[i].set_left_sibling(i - 1);
-        bNode[i].set_right_sibling(i + 1);
-    }
-    bNode[nodesInLevel0 + nodesInLevel1].set_right_sibling(-1);
     
     // level 0
     for (int i = 0; i < nodesInLevel0; i++) {
@@ -59,4 +54,23 @@ void BTree::bulkLoading(projectNode projectVector[60000])
         key[i] = bNode[nodesInLevel0 + i].get_key_of_node();
 
     bNode[nodesInLevel0 + nodesInLevel1].init(2, this, nodesInLevel1, key, NULL);
+
+    root_ptr_ = new BNode[nodesInLevel0 + nodesInLevel1 + 1];
+    for (int i = 0; i < nodesInLevel0 + nodesInLevel1 + 1; i++)
+        root_ptr_[i] = bNode[nodesInLevel0 + nodesInLevel1 - i];
+    for (int i = 0; i < nodesInLevel0 + nodesInLevel1 + 1; i++) {
+        root_ptr_[i].set_left_sibling(i - 1);
+        root_ptr_[i].set_right_sibling(i + 1);
+    }
+    root_ptr_[nodesInLevel0 + nodesInLevel1].set_right_sibling(-1);
+    tree_size_ = nodesInLevel0 + nodesInLevel1;
+    free(bNode);
+}
+
+bool BTree::writeFile() {
+    return 1;
+}
+
+bool BTree::readFile(char *fileName) {
+    return 1;
 }
