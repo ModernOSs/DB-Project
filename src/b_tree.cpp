@@ -67,10 +67,48 @@ void BTree::bulkLoading(projectNode projectVector[60000])
     delete []bNode;
 }
 
-bool BTree::writeFile() {
+bool BTree::writeFile(char *fileName) {
+    FILE * pFile;
+    pFile = fopen (fileName,"w");
+    if (pFile == NULL) {
+        printf("Open file %s failed.\n", fileName);
+        return false;
+    }
+    fputc (tree_size_ , pFile);
+    for (int i = 0; i < tree_size_; i++) {
+        char level = root_ptr_[i].get_level();
+        fwrite(&level, sizeof(char), 1, pFile);
+        int temp[] = {root_ptr_[i].get_num_entries(), root_ptr_[i].get_left_sibling(), root_ptr_[i].get_right_sibling()};
+        fwrite(temp, sizeof(int), 3, pFile);
+        fwrite(root_ptr_[i].get_key(), sizeof(double), root_ptr_[i].get_num_entries(), pFile);
+        fwrite(root_ptr_[i].get_son(), sizeof(int), root_ptr_[i].get_num_entries(), pFile);
+    }
+    fclose (pFile);
     return 1;
 }
 
 bool BTree::readFile(char *fileName) {
+    FILE * pFile;
+    pFile = fopen (fileName,"w");
+    if (pFile == NULL) {
+        printf("Open file %s failed.\n", fileName);
+        return false;
+    }
+    tree_size_ = fgetc(pFile);
+    root_ptr_ = new BNode[tree_size_];
+    for (int i = 0; i < tree_size_; i++) {
+        char level;
+        fread(&level, sizeof(char), 1, pFile);
+        int temp[3];
+        fread(temp, sizeof(int), 3, pFile);
+        double* key = new double[temp[0]];
+        int* son = new int[temp[0]];
+        fread(key, sizeof(double), temp[0], pFile);
+        fread(son, sizeof(int), temp[0], pFile);
+        root_ptr_[i].init(level, this, temp[0], key, son);
+        root_ptr_[i].set_left_sibling(temp[1]);
+        root_ptr_[i].set_right_sibling(temp[2]);
+    }
+    fclose (pFile);
     return 1;
 }

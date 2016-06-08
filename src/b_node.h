@@ -28,6 +28,10 @@ class BNode {
 	int  get_header_size();			    // get header size in b-node
 	double get_key_of_node();		    // get key of this node
 	bool isFull();					    // is full?
+	int get_left_sibling();
+	int get_right_sibling();
+	int* get_son();
+	double* get_key();
 
   protected:
 	char level_;						// level of b-tree (level > 0)

@@ -148,7 +148,8 @@ void bulkLoading() {
         BNode *root = NULL;
         BTree *bTree = new BTree(root);
         bTree->bulkLoading(projectVector[i]);
-        bTree->writeFile();
+        char filename[] = "data/tree";
+        //bTree->writeFile(filename);
     }
 
     free(projectVector);

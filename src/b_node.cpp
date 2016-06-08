@@ -80,4 +80,18 @@ void BNode::set_right_sibling(		// set addr of right sibling node
 	right_sibling_ = right_sibling;
 }
 
+int BNode::get_left_sibling() {
+	return left_sibling_;
+}
 
+int BNode::get_right_sibling() {
+	return right_sibling_;
+}
+
+int* BNode::get_son() {
+	return son_;
+}
+
+double* BNode::get_key() {
+	return key_;
+}

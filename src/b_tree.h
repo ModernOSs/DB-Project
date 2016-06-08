@@ -12,7 +12,7 @@ class BTree {
     BTree(BNode *root_ptr);         // constructor
     ~BTree();                       // destructor
     void bulkLoading(projectNode projectVector[60000]);
-    bool writeFile();
+    bool writeFile(char *fileName);
     bool readFile(char *fileName);
 };
 
