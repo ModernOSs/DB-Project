@@ -109,20 +109,39 @@ void geneRandProjVects() {
     }
 }
 
-double (*projectVector)[50];
+struct projectNode { int imageNum; double length; };
+projectNode (*projectVector)[60000];
 
 void projection() {
     printf("Projecting images to vectors...\n");
-    projectVector = (double((*)[50]))malloc(60000 * 50 * sizeof(double));
+    projectVector = (projectNode((*)[60000]))malloc(50 * 60000 * sizeof(projectNode));
 
     for (int i = 0; i < 60000; i++)
         for (int j = 0; j < 50; j++) {
-            projectVector[i][j] = 0;
+            projectVector[j][i].imageNum = i;
+            projectVector[j][i].length = 0;
             for (int k = 0; k < 784; k++)
-                projectVector[i][j] += (double)images[i][k] * projectData[j][k];
+                projectVector[j][i].length += (double)images[i][k] * projectData[j][k];
         }
 
     free(images);
+}
+
+int compare(const void *a, const void *b) {
+    projectNode (*node1)[60000] = (projectNode((*)[60000]))a;
+    projectNode (*node2)[60000] = (projectNode((*)[60000]))b;
+    return (**node1).length - (**node2).length;
+}
+
+void sortVector() {
+    for (int i = 0; i < 50; i++)
+        qsort(projectVector[i], 60000, sizeof(projectNode), compare);
+
+    for (int i = 0; i < 10; i++) {
+        for (int j = 0; j < 3; j++)
+            printf("%d %lf | ", projectVector[i][j].imageNum, projectVector[i][j].length);
+        printf("\n");
+    }
     free(projectVector);
 }
 
@@ -135,6 +154,7 @@ void preProcessing() {
     }
     geneRandProjVects();
     projection();
+    sortVector();
     double end = (double)(clock() - start) / (double)CLOCKS_PER_SEC;
     printf("\nPre-processing takes %lf seconds.\n", end);
 }
