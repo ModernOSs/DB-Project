@@ -11,4 +11,4 @@ b_tree.o: src/b_tree.cpp src/b_tree.h
 	g++ -c src/b_tree.cpp
 
 clean:
-	rm main.o pre_processing.o
+	rm main.o pre_processing.o b_node.o b_tree.o
