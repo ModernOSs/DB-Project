@@ -8,6 +8,7 @@ void normalize(double* data, int count);
 void geneRandProjVects();
 void projection();
 void sortVector();
+void bulkLoading();
 
 void preProcessing();
 

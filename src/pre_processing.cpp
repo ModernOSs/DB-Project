@@ -144,6 +144,11 @@ void sortVector() {
     free(projectVector);
 }
 
+void bulkLoading() {
+    printf("%lu\n", sizeof(projectNode));
+    printf("%d\n", (int)(1024 / sizeof(projectNode)));
+}
+
 void preProcessing() {
     clock_t start = clock();
     printf("==================== Pre-processing ====================\n");
@@ -154,6 +159,7 @@ void preProcessing() {
     geneRandProjVects();
     projection();
     sortVector();
+    bulkLoading();
     double end = (double)(clock() - start) / (double)CLOCKS_PER_SEC;
     printf("\nPre-processing takes %lf seconds.\n", end);
 }
