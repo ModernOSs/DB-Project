@@ -12,5 +12,6 @@ using namespace std;
 // self-defined headers
 #include "pre_processing.h"
 #include "b_node.h"
+#include "b_tree.h"
 
 #endif

@@ -3,7 +3,6 @@
 #ifndef _B_NODE_H
 #define _B_NODE_H
 
-class BlockFile;
 class BTree;
 
 class BNode {
@@ -13,10 +12,11 @@ class BNode {
 
 	virtual void init(					// init a new node, which not exist
 		int level,						// level (depth) in b-tree
-		BTree* btree);					// b-tree of this node
+		BTree* btree,  					// b-tree of this node
+		int num_entries,
+		double* key,
+		int *son);
 									       
-	virtual BNode* get_left_sibling();  // get left sibling node
-	virtual BNode* get_right_sibling(); // get right sibling node
 	void set_left_sibling(			    // set <left_sibling>
 		int left_sibling);				// addr of left sibling node
 	void set_right_sibling(			    // set <right sibling>
@@ -26,7 +26,7 @@ class BNode {
 	int get_num_entries();			    // get <num_entries_>
 	int get_level();				    // get <level_>
 	int  get_header_size();			    // get header size in b-node
-	float get_key_of_node();		    // get key of this node
+	double get_key_of_node();		    // get key of this node
 	bool isFull();					    // is full?
 
   protected:
@@ -34,7 +34,7 @@ class BNode {
 	int num_entries_;			    	// number of entries in this node
 	int left_sibling_;			    	// addr in disk for left sibling
 	int right_sibling_;			    	// addr in disk for right sibling
-	float* key_;						// keys
+	double* key_;						// keys
 	int* son_;
 
 	bool dirty_;						// if dirty, write back to file

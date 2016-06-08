@@ -109,7 +109,6 @@ void geneRandProjVects() {
     }
 }
 
-struct projectNode { int imageNum; double length; };
 projectNode (*projectVector)[60000];
 
 void projection() {
@@ -140,13 +139,18 @@ void sortVector() {
     printf("Sorting the vectors...\n");
     for (int i = 0; i < 50; i++)
         qsort(projectVector[i], 60000, sizeof(projectNode), compare);
-    
-    free(projectVector);
 }
 
 void bulkLoading() {
-    printf("%lu\n", sizeof(projectNode));
-    printf("%d\n", (int)(1024 / sizeof(projectNode)));
+    printf("Bulk-loading...\n");
+    for (int i = 0; i < 50; i++) {
+        BNode *root = NULL;
+        BTree *bTree = new BTree(root);
+        bTree->bulkLoading(projectVector[i]);
+        // write to disk
+    }
+
+    free(projectVector);
 }
 
 void preProcessing() {
