@@ -37,8 +37,6 @@ void BNode::init(					// init a new node, which not exist
 	dirty_ = true;					// init <dirty_>
 	left_sibling_ = -1;				// init <left_sibling_>
 	right_sibling_ = -1;			// init <right_sibling_>
-	key_ = NULL;					// init <key_>
-	son_ = NULL;
 
 	block_ = -1;					// init <block_>
 	capacity_ = -1;					// init <capacity_>
