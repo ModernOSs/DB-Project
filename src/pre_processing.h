@@ -12,6 +12,6 @@ void projection();
 void sortVector();
 void bulkLoading();
 
-void preProcessing();
+void preProcessing(double (&projectData_)[50][784], bool & isLow_);
 
 #endif

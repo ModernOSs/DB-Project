@@ -64,7 +64,7 @@ void BTree::bulkLoading(projectNode projectVector[60000])
     }
     root_ptr_[nodesInLevel0 + nodesInLevel1].set_right_sibling(-1);
     tree_size_ = nodesInLevel0 + nodesInLevel1;
-    free(bNode);
+    delete []bNode;
 }
 
 bool BTree::writeFile() {

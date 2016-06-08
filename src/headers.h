@@ -13,5 +13,6 @@ using namespace std;
 #include "pre_processing.h"
 #include "b_node.h"
 #include "b_tree.h"
+#include "medrank.h"
 
 #endif

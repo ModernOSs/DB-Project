@@ -95,6 +95,7 @@ void normalize(double* data, int count) {
 
 // generate random projection vectors an
 double projectData[50][784];
+
 void geneRandProjVects() {
     double data[784];
     int count = 784;
@@ -153,7 +154,7 @@ void bulkLoading() {
     free(projectVector);
 }
 
-void preProcessing() {
+void preProcessing(double (&projectData_)[50][784], bool & isLow_) {
     clock_t start = clock();
     printf("==================== Pre-processing ====================\n");
     if (readFromDataset() == 0) {
@@ -167,4 +168,9 @@ void preProcessing() {
 
     double end = (double)(clock() - start) / (double)CLOCKS_PER_SEC;
     printf("\nPre-processing takes %lf seconds.\n", end);
+
+    for (int i = 0; i < 50; i++)
+        for (int j = 0; j < 784; j++)
+            projectData_[i][j] = projectData[i][j];
+    isLow_ = isLow;
 }
