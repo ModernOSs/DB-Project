@@ -33,13 +33,13 @@ bool readFromDataset() {
         fread(temp, 4, 1, file);
         if (isLow) *temp = high2Low(*temp);
         switch (i) {
-            case 0: printf("Magic number: "); break;
-            case 1: printf("Number of images: "); break;
-            case 2: printf("Number of rows: "); break;
-            case 3: printf("Number of columns "); break;
+            case 0: printf("[Magic number: "); break;
+            case 1: printf("[Number of images: "); break;
+            case 2: printf("[Number of rows: "); break;
+            case 3: printf("[Number of columns "); break;
             default: break;
         }
-        printf("%d\n", *temp);
+        printf("%d]\n", *temp);
     }
     
     printf("Reading images from dataset...\n");
@@ -130,18 +130,17 @@ void projection() {
 int compare(const void *a, const void *b) {
     projectNode (*node1)[60000] = (projectNode((*)[60000]))a;
     projectNode (*node2)[60000] = (projectNode((*)[60000]))b;
-    return (**node1).length - (**node2).length;
+    if ((**node1).length > (**node2).length)
+        return 1;
+    else
+        return -1;
 }
 
 void sortVector() {
+    printf("Sorting the vectors...\n");
     for (int i = 0; i < 50; i++)
         qsort(projectVector[i], 60000, sizeof(projectNode), compare);
-
-    for (int i = 0; i < 10; i++) {
-        for (int j = 0; j < 3; j++)
-            printf("%d %lf | ", projectVector[i][j].imageNum, projectVector[i][j].length);
-        printf("\n");
-    }
+    
     free(projectVector);
 }
 
