@@ -21,6 +21,7 @@ int (*images)[784];
 bool readFromDataset() {
     checkEndian();
     FILE *file;
+    printf("Reading from dataset...\n");
     file = fopen("data/Mnist.ds", "rb");
     if (file == NULL)
         return 0;  // dataset is not open correctly
@@ -31,9 +32,17 @@ bool readFromDataset() {
     for (int i = 0; i < 4; i++) {
         fread(temp, 4, 1, file);
         if (isLow) *temp = high2Low(*temp);
+        switch (i) {
+            case 0: printf("Magic number: "); break;
+            case 1: printf("Number of images: "); break;
+            case 2: printf("Number of rows: "); break;
+            case 3: printf("Number of columns "); break;
+            default: break;
+        }
         printf("%d\n", *temp);
     }
     
+    printf("Reading images from dataset...\n");
     // 60,000 images, each has 784 bytes
     images = (int((*)[784]))malloc(60000 * 784 * sizeof(int));
     for (int i = 0; i < 60000; i++) {
@@ -89,6 +98,8 @@ double projectData[50][784];
 void geneRandProjVects() {
     double data[784];
     int count = 784;
+
+    printf("Generating random projection vectors...\n");
     for (int i = 0; i < 50; i++) {
         for (int j = 0; j < count; j++) {
             boxMuller(data, count);
@@ -98,15 +109,32 @@ void geneRandProjVects() {
     }
 }
 
+double (*projectVector)[50];
+
 void projection() {
+    printf("Projecting images to vectors...\n");
+    projectVector = (double((*)[50]))malloc(60000 * 50 * sizeof(double));
+
+    for (int i = 0; i < 60000; i++)
+        for (int j = 0; j < 50; j++) {
+            projectVector[i][j] = 0;
+            for (int k = 0; k < 784; k++)
+                projectVector[i][j] += (double)images[i][k] * projectData[j][k];
+        }
+
     free(images);
+    free(projectVector);
 }
 
 void preProcessing() {
+    clock_t start = clock();
+    printf("==================== Pre-processing ====================\n");
     if (readFromDataset() == 0) {
         printf("dataset is not open correctly\n");
         exit(1);
     }
     geneRandProjVects();
     projection();
+    double end = (double)(clock() - start) / (double)CLOCKS_PER_SEC;
+    printf("\nPre-processing takes %lf seconds.\n", end);
 }
