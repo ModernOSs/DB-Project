@@ -1,4 +1,5 @@
 #include "headers.h"
+#define HeaderSize sizeof(int)
 
 BTree::BTree() {
     h_key_ = NULL; l_key_ = NULL;
@@ -230,46 +231,58 @@ void BTree::resetSearch() {
 
 bool BTree::writeFile(char *fileName) {
     FILE * pFile;
-    pFile = fopen (fileName,"w");
+    pFile = fopen (fileName,"wb");
     if (pFile == NULL) {
         printf("Open file %s failed.\n", fileName);
         return false;
     }
-    fputc (tree_size_ , pFile);
-    for (int i = 0; i < tree_size_; i++) {
-        char level = root_ptr_[i].get_level();
-        fwrite(&level, sizeof(char), 1, pFile);
-        int temp[] = {root_ptr_[i].get_num_entries(), root_ptr_[i].get_left_sibling(), root_ptr_[i].get_right_sibling()};
-        fwrite(temp, sizeof(int), 3, pFile);
-        fwrite(root_ptr_[i].get_key(), sizeof(double), root_ptr_[i].get_num_entries(), pFile);
-        fwrite(root_ptr_[i].get_son(), sizeof(int), root_ptr_[i].get_num_entries(), pFile);
+    //set header
+    fwrite (&tree_size_ , sizeof(int), sizeof(int), pFile);
+    fseek (pFile, 1024 ,SEEK_SET);
+
+    //set nodes
+    int vectorsInNode = floor((double)(1024 - sizeof(char) - sizeof(int) * 3) /
+                              (double)(sizeof(double) + sizeof(int)));
+    int nodesInLevel0 = ceil((double)60000 / (double)vectorsInNode);
+    int nodesInLevel1 = ceil((double)nodesInLevel0 / (double)vectorsInNode);
+    for (int i = 0; i < nodesInLevel0 + nodesInLevel1 + 1; ++i)
+    {
+        char* temp = (char*)malloc(1024);
+        root_ptr_[i].write_to_buffer(temp);
+        fwrite(temp, sizeof(char), 1024, pFile);
+        free(temp);
     }
-    fclose (pFile);
+    fclose(pFile);
     return 1;
 }
 
 bool BTree::readFile(char *fileName) {
     FILE * pFile;
-    pFile = fopen (fileName,"w");
+    pFile = fopen (fileName,"rb");
     if (pFile == NULL) {
         printf("Open file %s failed.\n", fileName);
         return false;
     }
-    tree_size_ = fgetc(pFile);
-    root_ptr_ = new BNode[tree_size_];
-    for (int i = 0; i < tree_size_; i++) {
-        char level;
-        fread(&level, sizeof(char), 1, pFile);
-        int temp[3];
-        fread(temp, sizeof(int), 3, pFile);
-        double* key = new double[temp[0]];
-        int* son = new int[temp[0]];
-        fread(key, sizeof(double), temp[0], pFile);
-        fread(son, sizeof(int), temp[0], pFile);
-        root_ptr_[i].init(level, this, temp[0], key, son);
-        root_ptr_[i].set_left_sibling(temp[1]);
-        root_ptr_[i].set_right_sibling(temp[2]);
+    
+    //read header
+    fread(&tree_size_, sizeof(int), sizeof(int), pFile);
+    fseek (pFile, 1024 ,SEEK_SET);
+
+    //read nodes
+    int vectorsInNode = floor((double)(1024 - sizeof(char) - sizeof(int) * 3) /
+                              (double)(sizeof(double) + sizeof(int)));
+    int nodesInLevel0 = ceil((double)60000 / (double)vectorsInNode);
+    int nodesInLevel1 = ceil((double)nodesInLevel0 / (double)vectorsInNode);
+    if (root_ptr_ != NULL) delete []root_ptr_;
+    root_ptr_ = new BNode[nodesInLevel0 + nodesInLevel1 + 1];
+    for (int i = 0; i < nodesInLevel0 + nodesInLevel1 + 1; ++i)
+    {
+        char* temp = (char*)malloc(1024);
+        fread(temp, sizeof(char), 1024, pFile);
+        root_ptr_[i].read_from_buffer(temp);
+        free(temp);
     }
+
     fclose (pFile);
     return 1;
 }

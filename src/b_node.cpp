@@ -1,4 +1,7 @@
 // from TA's files
+#define SIZECHAR sizeof(char)
+#define SIZEINT sizeof(int)
+#define SIZEDOUBLE sizeof(double)
 
 #include "headers.h"
 
@@ -94,4 +97,55 @@ int* BNode::get_son() {
 
 double* BNode::get_key() {
 	return key_;
+}
+
+void BNode::write_to_buffer(char* buf) {
+	int i = 0;	
+	memcpy(&buf[i], &level_, SIZECHAR);
+	i += SIZECHAR;
+
+	memcpy(&buf[i], &num_entries_, SIZEINT);
+	i += SIZEINT;
+
+	memcpy(&buf[i], &left_sibling_, SIZEINT);
+	i += SIZEINT;
+
+	memcpy(&buf[i], &right_sibling_, SIZEINT);
+	i += SIZEINT;
+
+	for (int j = 0; j < num_entries_; j++) {
+		memcpy(&buf[i], &key_[j], SIZEDOUBLE);
+		i += SIZEDOUBLE;
+
+		if (level_ == 0) {
+			memcpy(&buf[i], &son_[j], SIZEINT);
+		}
+		i += SIZEINT;
+	}
+}
+
+void BNode::read_from_buffer(char* buf) {
+	int i = 0;
+	memcpy(&level_, &buf[i], SIZECHAR);
+	i += SIZECHAR;
+
+	memcpy(&num_entries_, &buf[i], SIZEINT);
+	i += SIZEINT;
+
+	memcpy(&left_sibling_, &buf[i], SIZEINT);
+	i += SIZEINT;
+
+	memcpy(&right_sibling_, &buf[i], SIZEINT);
+	i += SIZEINT;
+
+	key_ = new double[num_entries_];
+	if (level_ == 0) son_ = new int[num_entries_];
+	else son_ = NULL;
+	for (int j = 0; j < num_entries_; j++) {
+		memcpy(&key_[j], &buf[i], SIZEDOUBLE);
+		i += SIZEDOUBLE;
+
+		if (level_ == 0) memcpy(&son_[j], &buf[i], SIZEINT);
+		i += SIZEINT;
+	}
 }

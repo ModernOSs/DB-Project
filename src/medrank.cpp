@@ -88,10 +88,10 @@ void MEDRANK(double (&projectData)[50][784], bool & isLow, BTree *bTree) {
         bTree[t].resetSearch();
 
     for (int i = 0; i < 100; i++) {
+        printf("Voting for query number %d...\n", i + 1);
         while (max_counter <= 25) {
             for (int j = 0; j < 50; j++) {
                 int temp = bTree[j].searchNextImage(projectQueryVector[i][j]);
-                // printf("search key: %lf\timage number: %d\n", projectQueryVector[i][j], temp);
                 for (int k = 0; k < structSize; k++) {
                     if (result[k].imageNum == temp) {
                         result[k].counter++;
@@ -112,12 +112,11 @@ void MEDRANK(double (&projectData)[50][784], bool & isLow, BTree *bTree) {
         }
         for (int t = 0; t < 50; t++)
             bTree[t].resetSearch();
-        printf("right\n");
         qsort(result, structSize, sizeof(struct find), Compare);
-        printf("Top c search reslut.");
-        printf("imageNum\tVoters\n");
+        printf("Top c search results:\n");
+        printf("image number\tVoters\n");
         for (int m = 0; m < 1; m++) {
-            printf("%d\t%d\n", result[m].imageNum, result[m].counter);
+            printf("%d\t\t%d\n", result[m].imageNum, result[m].counter);
         }
         structSize = 0;
         exist = false;

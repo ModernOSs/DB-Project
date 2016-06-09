@@ -32,6 +32,8 @@ class BNode {
 	int get_right_sibling();
 	int* get_son();
 	double* get_key();
+	void write_to_buffer(char* buf);
+	void read_from_buffer(char* buf);
 
   protected:
 	char level_;						// level of b-tree (level > 0)

@@ -149,8 +149,13 @@ void bulkLoading() {
     bTree = new BTree[50];
     for (int i = 0; i < 50; i++) {
         bTree[i].bulkLoading(projectVector[i]);
-        char filename[] = "data/tree";
-        // bTree->writeFile(filename);
+        BNode *root = NULL;
+        BTree *bTree = new BTree(root);
+        bTree->bulkLoading(projectVector[i]);
+        char fileName[128];
+        sprintf(fileName, "forest/tree_%d", i);
+        bTree->writeFile(fileName);
+        bTree->readFile(fileName);
     }
 
     free(projectVector);

@@ -23,7 +23,7 @@ class BTree {
     int searchNextImage(double searchKey);
     void resetSearch();
     bool writeFile(char *fileName);
-    bool readFile(char *fileName); 
+    bool readFile(char *fileName);
 };
 
 #endif
