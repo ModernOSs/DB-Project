@@ -1,6 +1,8 @@
 #ifndef _PRE_PROCESSING_H_
 #define _PRE_PROCESSING_H_
 
+class BTree;
+
 struct projectNode { int imageNum; double length; };
 
 void checkEndian();
@@ -12,6 +14,6 @@ void projection();
 void sortVector();
 void bulkLoading();
 
-void preProcessing(double (&projectData_)[50][784], bool & isLow_);
+void preProcessing();
 
 #endif

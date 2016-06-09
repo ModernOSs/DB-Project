@@ -6,6 +6,8 @@
 #include <math.h>
 #include <time.h>
 
+
+#include <iostream>
 #include <limits>
 using namespace std;
 

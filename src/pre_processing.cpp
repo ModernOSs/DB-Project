@@ -142,20 +142,21 @@ void sortVector() {
         qsort(projectVector[i], 60000, sizeof(projectNode), compare);
 }
 
+BTree *bTree;
+
 void bulkLoading() {
     printf("Bulk-loading...\n");
+    bTree = new BTree[50];
     for (int i = 0; i < 50; i++) {
-        BNode *root = NULL;
-        BTree *bTree = new BTree(root);
-        bTree->bulkLoading(projectVector[i]);
+        bTree[i].bulkLoading(projectVector[i]);
         char filename[] = "data/tree";
-        //bTree->writeFile(filename);
+        // bTree->writeFile(filename);
     }
 
     free(projectVector);
 }
 
-void preProcessing(double (&projectData_)[50][784], bool & isLow_) {
+void preProcessing() {
     clock_t start = clock();
     printf("==================== Pre-processing ====================\n");
     if (readFromDataset() == 0) {
@@ -170,8 +171,5 @@ void preProcessing(double (&projectData_)[50][784], bool & isLow_) {
     double end = (double)(clock() - start) / (double)CLOCKS_PER_SEC;
     printf("\nPre-processing takes %lf seconds.\n", end);
 
-    for (int i = 0; i < 50; i++)
-        for (int j = 0; j < 784; j++)
-            projectData_[i][j] = projectData[i][j];
-    isLow_ = isLow;
+    MEDRANK(projectData, isLow, bTree);
 }

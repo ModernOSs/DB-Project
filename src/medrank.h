@@ -3,6 +3,6 @@
 
 bool readFromQuery();
 
-void MEDRANK(double (&projectData_)[50][784], bool & isLow_);
+void MEDRANK(double (&projectData)[50][784], bool & isLow, BTree *bTree);
 
 #endif

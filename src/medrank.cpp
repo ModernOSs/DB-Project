@@ -1,7 +1,11 @@
 #include "headers.h"
 
 int queryVector[100][784];                      // querySet
-double projectQueryVector[50][100];             // after project
+double projectQueryVector[100][50];             // after project
+struct find{
+        int imageNum;
+        int counter;
+    };
 
 // turn high-endian data to low-endian data
 #define high2Low(data) ((((uint32_t)(data) & 0xff000000) >> 24) | \
@@ -53,14 +57,18 @@ void projection(double (&projectData)[50][784]) {
     printf("Projecting queryset to vectors...\n");
     for (int i = 0; i < 100; i++) {
         for (int j = 0; j < 50; j++) {
-            projectQueryVector[j][i] = 0;
+            projectQueryVector[i][j] = 0;
             for (int k = 0; k < 784; k++)
-                projectQueryVector[j][i] += queryVector[i][k] * projectData[j][k];
+                projectQueryVector[i][j] += queryVector[i][k] * projectData[j][k];
         }
     }
 }
 
-void MEDRANK(double (&projectData)[50][784], bool & isLow) {
+int Compare(const void *a, const void *b) {
+    return ((struct find *)b)->counter - ((struct find *)a)->counter;
+}
+
+void MEDRANK(double (&projectData)[50][784], bool & isLow, BTree *bTree) {
     clock_t start = clock();
     printf("======================= MEDRENK ========================\n");
     if (readFromQuery(isLow) == 0) {
@@ -68,25 +76,54 @@ void MEDRANK(double (&projectData)[50][784], bool & isLow) {
         exit(1);
     }
 
-    int resultCounter[60000];
-
-    for (int i = 0; i < 60000; i++) {
-        resultCounter[i] = 0;
-    }
+    int structSize = 0;
+    bool exist = false;
+    struct find *result = (struct find*)malloc(60000*sizeof(struct find));
+    int temp;
+    int max_counter = 0;
 
     projection(projectData);
-    /*while (true) {
-        for (int j = 0; j < 50; j++)
-            for (int i = 0; i < 100; i++) {
-                int imageNum = search(projectVector[j][i], h[j][i], l[j][i]);
-                resultCounter[imageNum] ++;
-                if (resultCounter[imageNum] > 25) {
-                    break;
+
+    for (int t = 0; t < 50; t++)
+        bTree[t].resetSearch();
+
+    for (int i = 0; i < 100; i++) {
+        while (max_counter <= 25) {
+            for (int j = 0; j < 50; j++) {
+                int temp = bTree[j].searchNextImage(projectQueryVector[i][j]);
+                // printf("search key: %lf\timage number: %d\n", projectQueryVector[i][j], temp);
+                for (int k = 0; k < structSize; k++) {
+                    if (result[k].imageNum == temp) {
+                        result[k].counter++;
+                        if (max_counter < result[k].counter)
+                            max_counter = result[k].counter;
+                        exist = true;
+                        break;
+                    }
+                }
+                if (exist == false) {
+                    result[structSize].imageNum = temp;
+                    result[structSize].counter = 1;
+                    structSize++;
+                } else {
+                    exist = false;
                 }
             }
-    }*/
-
-
+        }
+        for (int t = 0; t < 50; t++)
+            bTree[t].resetSearch();
+        printf("right\n");
+        qsort(result, structSize, sizeof(struct find), Compare);
+        printf("Top c search reslut.");
+        printf("imageNum\tVoters\n");
+        for (int m = 0; m < 1; m++) {
+            printf("%d\t%d\n", result[m].imageNum, result[m].counter);
+        }
+        structSize = 0;
+        exist = false;
+        max_counter = 0;
+    }
+    
     double end = (double)(clock() - start) / (double)CLOCKS_PER_SEC;
     printf("\nMEDRENK takes %lf seconds.\n", end);
 }
