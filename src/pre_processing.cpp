@@ -146,6 +146,10 @@ BTree *bTree;
 
 void bulkLoading() {
     printf("Bulk-loading...\n");
+    if (mkdir("forest/", 0777)) {
+        printf("Creating route failed!\n");
+        exit(0);
+    }
     bTree = new BTree[50];
     for (int i = 0; i < 50; i++) {
         bTree[i].bulkLoading(projectVector[i]);

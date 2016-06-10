@@ -1,7 +1,7 @@
-b_plus_tree: main.o pre_processing.o b_node.o b_tree.o \
-	         medrank.o
-	g++ -o b_plus_tree main.o pre_processing.o b_node.o b_tree.o \
-	                   medrank.o
+medrank: main.o pre_processing.o b_node.o b_tree.o \
+	     medrank.o
+	g++ -o medrank main.o pre_processing.o b_node.o b_tree.o \
+	               medrank.o
 
 main.o: src/main.cpp src/headers.h
 	g++ -c src/main.cpp
@@ -16,3 +16,4 @@ medrank.o: src/medrank.cpp src/medrank.h
 
 clean:
 	rm main.o pre_processing.o b_node.o b_tree.o medrank.o
+	rm -r forest
