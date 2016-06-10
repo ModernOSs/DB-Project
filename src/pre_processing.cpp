@@ -1,6 +1,8 @@
 #include "headers.h"
 
 bool isLow;
+double rand_temp[50];
+
 
 void checkEndian() {
     short int test = 0x1234;
@@ -62,11 +64,13 @@ bool readFromDataset() {
 }
 
 // standard normal distribution N(0, 1)
-void boxMuller(double* data, int count) {
+void boxMuller(double* data, int count, int number) {
     static const double epsilon = numeric_limits<double>::min();
     static const double twopi = double(2.0 * 3.14159265358979323846);
     double u1;
     double u2;
+
+    srand(rand_temp[number]);
 
     for (int i = 0; i < count; i += 2) {
         do {
@@ -99,12 +103,15 @@ double projectData[50][784];
 void geneRandProjVects() {
     double data[784];
     int count = 784;
+    srand((int)time(0));
+    for (int i = 0; i < 50; i++)
+        rand_temp[i] = rand() % RAND_MAX;
 
     printf("Generating random projection vectors...\n");
     for (int i = 0; i < 50; i++) {
+        boxMuller(data, count, i);
+        normalize(data, count);
         for (int j = 0; j < count; j++) {
-            boxMuller(data, count);
-            normalize(data, count);
             projectData[i][j] = data[j];
         }
     }

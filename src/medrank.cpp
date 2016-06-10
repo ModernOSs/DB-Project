@@ -1,6 +1,6 @@
 #include "headers.h"
 
-int queryVector[100][784];                      // querySet
+double queryVector[100][784];                      // querySet
 double projectQueryVector[100][50];             // after project
 struct find{
         int imageNum;
@@ -55,14 +55,17 @@ bool readFromQuery(bool isLow) {
 
 void projection(double (&projectData)[50][784]) {
     printf("Projecting queryset to vectors...\n");
-    for (int i = 0; i < 100; i++) {
+    for (int i = 0; i < 2; i++) {
         for (int j = 0; j < 50; j++) {
             projectQueryVector[i][j] = 0;
-            for (int k = 0; k < 784; k++)
+            for (int k = 0; k < 784; k++) {
                 projectQueryVector[i][j] += queryVector[i][k] * projectData[j][k];
+            }
         }
     }
 }
+
+
 
 int Compare(const void *a, const void *b) {
     return ((struct find *)b)->counter - ((struct find *)a)->counter;
@@ -79,7 +82,7 @@ void MEDRANK(double (&projectData)[50][784], bool & isLow, BTree *bTree) {
     int structSize = 0;
     bool exist = false;
     struct find *result = (struct find*)malloc(60000*sizeof(struct find));
-    int temp;
+    int temp = -1;
     int max_counter = 0;
 
     projection(projectData);
@@ -87,11 +90,12 @@ void MEDRANK(double (&projectData)[50][784], bool & isLow, BTree *bTree) {
     for (int t = 0; t < 50; t++)
         bTree[t].resetSearch();
 
-    for (int i = 0; i < 100; i++) {
+    for (int i = 0; i < 1; i++) {
         printf("Voting for query number %d...\n", i + 1);
         while (max_counter <= 25) {
             for (int j = 0; j < 50; j++) {
-                int temp = bTree[j].searchNextImage(projectQueryVector[i][j]);
+                temp = bTree[j].searchNextImage(projectQueryVector[i][j]);
+                //printf("%d\t%lf\n", temp, projectQueryVector[i][j]);
                 for (int k = 0; k < structSize; k++) {
                     if (result[k].imageNum == temp) {
                         result[k].counter++;
@@ -108,6 +112,8 @@ void MEDRANK(double (&projectData)[50][784], bool & isLow, BTree *bTree) {
                 } else {
                     exist = false;
                 }
+                if (max_counter > 25)
+                    break;
             }
         }
         for (int t = 0; t < 50; t++)
@@ -121,6 +127,7 @@ void MEDRANK(double (&projectData)[50][784], bool & isLow, BTree *bTree) {
         structSize = 0;
         exist = false;
         max_counter = 0;
+        temp = -1;
     }
     
     double end = (double)(clock() - start) / (double)CLOCKS_PER_SEC;
