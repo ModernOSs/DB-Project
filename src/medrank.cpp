@@ -2,10 +2,6 @@
 
 double queryVector[100][784];                   // querySet
 double projectQueryVector[100][50];             // after project
-struct find{
-        int imageNum;
-        int counter;
-    };
 double nearest[100];
 double realNearest[100];
 
@@ -113,11 +109,6 @@ double getRatio() {
     return ratio;
 }
 
-
-int Compare(const void *a, const void *b) {
-    return ((struct find *)b)->counter - ((struct find *)a)->counter;
-}
-
 void MEDRANK(double (&projectData)[50][784], bool & isLow, BTree *bTree, int (*images)[784]) {
     printf("======================= MEDRENK ========================\n");
     if (readFromQuery(isLow) == 0) {
@@ -127,16 +118,21 @@ void MEDRANK(double (&projectData)[50][784], bool & isLow, BTree *bTree, int (*i
 
     findNearest(images);
 
-    int structSize = 0;
     bool exist = false;
-    struct find *result = (struct find*)malloc(60000*sizeof(struct find));
+    int result[60000];
+    for (int i = 0; i < 60000; i++)
+        result[i] = 0;
     int temp = -1;
     int max_counter = 0;
+    int max_image_number = -1;
 
     projection(projectData);
 
     for (int t = 0; t < 50; t++)
         bTree[t].resetSearch();
+
+    double sum_IO = 0;
+    double sum_time = 0;
 
     printf("Top search results: \n");
     for (int i = 0; i < 100; i++) {
@@ -145,31 +141,19 @@ void MEDRANK(double (&projectData)[50][784], bool & isLow, BTree *bTree, int (*i
         while (max_counter <= 25) {
             for (int j = 0; j < 50; j++) {
                 temp = bTree[j].searchNextImage(projectQueryVector[i][j]);
-                for (int k = 0; k < structSize; k++) {
-                    if (result[k].imageNum == temp) {
-                        result[k].counter++;
-                        if (max_counter < result[k].counter)
-                            max_counter = result[k].counter;
-                        exist = true;
-                        break;
-                    }
-                }
-                if (exist == false) {
-                    result[structSize].imageNum = temp;
-                    result[structSize].counter = 1;
-                    structSize++;
-                } else {
-                    exist = false;
+                result[temp]++;
+                if (result[temp] > max_counter) {
+                    max_counter = result[temp];
+                    max_image_number = temp;
                 }
                 if (max_counter > 25)
                     break;
             }
         }
-        qsort(result, structSize, sizeof(struct find), Compare);
 
-        printf("[Image number: %d]\n", result[0].imageNum);
+        printf("[Image number: %d]\n", max_image_number);
 
-        MEDRANK_nearest(images, result[0].imageNum, i);
+        MEDRANK_nearest(images, max_image_number, i);
         printf("[ratio: %lf]\n", nearest[i] / realNearest[i]);
 
         int IOCount = 0;
@@ -178,16 +162,22 @@ void MEDRANK(double (&projectData)[50][784], bool & isLow, BTree *bTree, int (*i
             bTree[t].resetSearch();
         }
         printf("[I/O cost: %d pages]\n", IOCount);
+        sum_IO += IOCount;
 
         double end = (double)(clock() - start) / (double)CLOCKS_PER_SEC;
         printf("[Running time: %lf seconds]\n", end);
+        sum_time += end;
 
-        structSize = 0;
         exist = false;
         max_counter = 0;
+        max_image_number = -1;
         temp = -1;
+        for (int i = 0; i < 60000; i++)
+            result[i] = 0;
     }
 
     double ratio = getRatio();
     printf("\n[MEDRANK's Average Ratio: %lf]\n", ratio);
+    printf("[MEDRANK's Average I/O cost: %lf]\n", sum_IO / 100);
+    printf("[MEDRANK's Average Running Time cost: %lf]\n", sum_time / 100);
 }
