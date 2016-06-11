@@ -5,6 +5,7 @@ BTree::BTree() {
     h_key_ = NULL; l_key_ = NULL;
     h_son_ = NULL; l_son_ = NULL;
     min_h_ = 0; max_l_ = 0;
+    num_of_visits_ = 0;
 }
 
 BTree::BTree(BNode *root_ptr)       // constructor
@@ -13,11 +14,18 @@ BTree::BTree(BNode *root_ptr)       // constructor
     h_key_ = NULL; l_key_ = NULL;
     h_son_ = NULL; l_son_ = NULL;
     min_h_ = 0; max_l_ = 0;
+    num_of_visits_ = 0;
 }
 
 BTree::~BTree()                     // destructor
 {
-
+    h_key_ = NULL; l_key_ = NULL;
+    h_son_ = NULL; l_son_ = NULL;
+    min_h_ = 0; max_l_ = 0;
+    num_of_visits_ = 0;
+    tree_size_ = 0;
+    if (root_ptr_ != NULL) delete []root_ptr_;
+    root_ptr_ = NULL;
 }
                                     // bulkload a tree from memory
 void BTree::bulkLoading(projectNode projectVector[60000])
@@ -101,6 +109,7 @@ void BTree::getNextH(double searchKey) {
                         level1 = i;
                     break;
                 }
+            num_of_visits_++;
 
             // level 1 -> level 0
             h_level0_ = vectorsInNode * (level1 - 1) + root_ptr_[level1].get_num_entries()
@@ -114,6 +123,7 @@ void BTree::getNextH(double searchKey) {
                                  root_ptr_[0].get_num_entries();
                     break;
                 }
+            num_of_visits_++;
 
             // search level 0
             h_key_ = (root_ptr_[h_level0_].get_key()) + (root_ptr_[h_level0_].get_num_entries() - 1);
@@ -137,6 +147,7 @@ void BTree::getNextH(double searchKey) {
                          root_ptr_[h_level0_].get_num_entries() - 1;
                 h_son_ = root_ptr_[h_level0_].get_son() +
                          root_ptr_[h_level0_].get_num_entries() - 1;
+                num_of_visits_++;
             } else {
                 h_key_--;
                 h_son_--;
@@ -166,6 +177,7 @@ void BTree::getNextL(double searchKey) {
       }
       else if (h_key_ == root_ptr_[h_level0_].get_key() + (root_ptr_[h_level0_].get_num_entries() - 1)) {
         l_level0_ = h_level0_ + 1;
+        num_of_visits_++;
         l_key_ = root_ptr_[l_level0_].get_key();
         l_son_ = root_ptr_[l_level0_].get_son();
       } else {
@@ -176,6 +188,7 @@ void BTree::getNextL(double searchKey) {
     } else {
         if (l_key_ == root_ptr_[l_level0_].get_key() + (root_ptr_[l_level0_].get_num_entries() - 1)) {
             l_level0_++;
+            num_of_visits_++;
             l_key_ = root_ptr_[l_level0_].get_key();
             l_son_ = root_ptr_[l_level0_].get_son();
         } else {
@@ -227,6 +240,7 @@ void BTree::resetSearch() {
     h_key_ = NULL; l_key_ = NULL;
     h_son_ = NULL; l_son_ = NULL;
     min_h_ = 0; max_l_ = 0;
+    num_of_visits_ = 0;
 }
 
 bool BTree::writeFile(char *fileName) {
@@ -274,6 +288,7 @@ bool BTree::readFile(char *fileName) {
     int nodesInLevel0 = ceil((double)60000 / (double)vectorsInNode);
     int nodesInLevel1 = ceil((double)nodesInLevel0 / (double)vectorsInNode);
     if (root_ptr_ != NULL) delete []root_ptr_;
+    root_ptr_ = NULL;
     root_ptr_ = new BNode[nodesInLevel0 + nodesInLevel1 + 1];
     for (int i = 0; i < nodesInLevel0 + nodesInLevel1 + 1; ++i)
     {

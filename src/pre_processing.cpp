@@ -153,10 +153,13 @@ BTree *bTree;
 
 void bulkLoading() {
     printf("Bulk-loading...\n");
-    if (mkdir("forest/", 0777)) {
-        printf("Creating route failed!\n");
-        exit(0);
+    if (access("forest/", 0) == -1) {
+        if (mkdir("forest/", 0777)) {
+            printf("Creating route failed!\n");
+            exit(0);
+        }
     }
+    clock_t start = clock();
     bTree = new BTree[50];
     for (int i = 0; i < 50; i++) {
         bTree[i].bulkLoading(projectVector[i]);
@@ -168,6 +171,13 @@ void bulkLoading() {
         bTree->writeFile(fileName);
         bTree->readFile(fileName);
     }
+    double end = (double)(clock() - start) / (double)CLOCKS_PER_SEC;
+    int vectorsInNode = floor((double)(1024 - sizeof(char) - sizeof(int) * 3) /
+                              (double)(sizeof(double) + sizeof(int)));
+    int nodesInLevel0 = ceil((double)60000 / (double)vectorsInNode);
+    int nodesInLevel1 = ceil((double)nodesInLevel0 / (double)vectorsInNode);
+    printf("[Index size: %d kB]\n", (nodesInLevel0 + nodesInLevel1 + 1) * 50);
+    printf("[Indexing time: %lf seconds]\n", end);
 
     free(projectVector);
 }
@@ -185,7 +195,7 @@ void preProcessing() {
     bulkLoading();
 
     double end = (double)(clock() - start) / (double)CLOCKS_PER_SEC;
-    printf("\nPre-processing takes %lf seconds.\n", end);
+    printf("\n[Pre-processing time: %lf seconds]\n\n", end);
 
     MEDRANK(projectData, isLow, bTree, images);
 }

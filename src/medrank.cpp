@@ -1,12 +1,12 @@
 #include "headers.h"
 
-double queryVector[100][784];                      // querySet
+double queryVector[100][784];                   // querySet
 double projectQueryVector[100][50];             // after project
 struct find{
         int imageNum;
         int counter;
     };
-double Nearest[100];
+double nearest[100];
 double realNearest[100];
 
 // turn high-endian data to low-endian data
@@ -71,6 +71,7 @@ void projection(double (&projectData)[50][784]) {
 // find the real nearest number
 // images[60000][784], query[50][784]
 void findNearest(int (*images)[784]) {
+    printf("Finding the real nearest numbers...\n");
     double currentLength = 0;
     double minLength;
 
@@ -86,9 +87,9 @@ void findNearest(int (*images)[784]) {
             if (currentLength < minLength) {
                 minLength = currentLength;
             }
+            currentLength = 0;
         }
         realNearest[i] = minLength;
-        currentLength = 0;
     }
 }
 
@@ -98,15 +99,15 @@ void MEDRANK_nearest(int (*images)[784], int ImageNum, int Counter) {
     tempLength = 0;
     for (int i = 0; i < 784; i++) {
         tempLength += (images[ImageNum][i] - queryVector[Counter][i])
-                        *(images[ImageNum][i] - queryVector[Counter][i]);
+                     *(images[ImageNum][i] - queryVector[Counter][i]);
     }
-    Nearest[Counter] = sqrt(tempLength);
+    nearest[Counter] = sqrt(tempLength);
 }
 
-double Ratio() {
+double getRatio() {
     double ratio = 0;
     for (int i = 0; i < 100; i++) {
-        ratio += Nearest[i] / realNearest[i];
+        ratio += nearest[i] / realNearest[i];
     }
     ratio = ratio / 100;
     return ratio;
@@ -118,14 +119,12 @@ int Compare(const void *a, const void *b) {
 }
 
 void MEDRANK(double (&projectData)[50][784], bool & isLow, BTree *bTree, int (*images)[784]) {
-    clock_t start = clock();
     printf("======================= MEDRENK ========================\n");
     if (readFromQuery(isLow) == 0) {
         printf("Dataset is not open correctly\n");
         exit(1);
     }
 
-    printf("Finding the real nearest number...\n");
     findNearest(images);
 
     int structSize = 0;
@@ -139,7 +138,9 @@ void MEDRANK(double (&projectData)[50][784], bool & isLow, BTree *bTree, int (*i
     for (int t = 0; t < 50; t++)
         bTree[t].resetSearch();
 
+    printf("Top search results: \n");
     for (int i = 0; i < 100; i++) {
+        clock_t start = clock();
         printf("Voting for query number %d...\n", i + 1);
         while (max_counter <= 25) {
             for (int j = 0; j < 50; j++) {
@@ -164,19 +165,29 @@ void MEDRANK(double (&projectData)[50][784], bool & isLow, BTree *bTree, int (*i
                     break;
             }
         }
-        for (int t = 0; t < 50; t++)
-            bTree[t].resetSearch();
         qsort(result, structSize, sizeof(struct find), Compare);
+
+        printf("[Image number: %d]\n", result[0].imageNum);
+
         MEDRANK_nearest(images, result[0].imageNum, i);
-        printf("[ratio: %lf]\n", Nearest[i] / realNearest[i]);
-        
+        printf("[ratio: %lf]\n", nearest[i] / realNearest[i]);
+
+        int IOCount = 0;
+        for (int t = 0; t < 50; t++) {
+            IOCount += bTree[t].num_of_visits_;
+            bTree[t].resetSearch();
+        }
+        printf("[I/O cost: %d pages]\n", IOCount);
+
+        double end = (double)(clock() - start) / (double)CLOCKS_PER_SEC;
+        printf("[Running time: %lf seconds]\n", end);
+
         structSize = 0;
         exist = false;
         max_counter = 0;
         temp = -1;
     }
-    double end = (double)(clock() - start) / (double)CLOCKS_PER_SEC;
-    printf("\nMEDRENK takes %lf seconds.\n", end);
-    double ratio = Ratio();
-    printf("MEDRANK's Average Ratio is %lf\n", ratio);
+
+    double ratio = getRatio();
+    printf("\n[MEDRANK's Average Ratio: %lf]\n", ratio);
 }

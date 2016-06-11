@@ -13,6 +13,7 @@
 using namespace std;
 
 // Linux / Unix headers
+ #include <unistd.h>
  #include <sys/stat.h>
  #include <sys/types.h>
 

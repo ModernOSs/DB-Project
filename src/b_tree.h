@@ -8,6 +8,7 @@ class BTree {
     // BlockFile* file_;            // file in disk to store
     BNode* root_ptr_;               // pointer of root
     int tree_size_;
+    int num_of_visits_;
 
     BTree();
     BTree(BNode *root_ptr);         // constructor
