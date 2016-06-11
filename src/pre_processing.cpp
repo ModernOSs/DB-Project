@@ -131,7 +131,7 @@ void projection() {
                 projectVector[j][i].length += (double)images[i][k] * projectData[j][k];
         }
 
-    free(images);
+    // free(images);
 }
 
 int compare(const void *a, const void *b) {
@@ -187,5 +187,5 @@ void preProcessing() {
     double end = (double)(clock() - start) / (double)CLOCKS_PER_SEC;
     printf("\nPre-processing takes %lf seconds.\n", end);
 
-    MEDRANK(projectData, isLow, bTree);
+    MEDRANK(projectData, isLow, bTree, images);
 }
